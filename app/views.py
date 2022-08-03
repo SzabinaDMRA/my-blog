@@ -57,10 +57,3 @@ def Result():
         'kimya': request.form["kimya"]
     }
     return render_template("student_result.html", **ContextData)
-
-
-
-
-
-
-
