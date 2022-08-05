@@ -1,10 +1,18 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, session
+from .session_interface import MySessionInterface
 
 app = Flask(__name__)
+app.secret_key = b"?8jyhf73hf"
+app.session_interface = MySessionInterface()
 
 
 @app.route("/")
 def Definition():
+    if 'name' in session:
+        print('name', session['name'])
+    session['name'] = "Ahmet"
+    session['lastname'] = "Özgür"
+    session['username'] = "ahmet1234"
     return "<html><body><h1>İlk Flask denemesi</h1></body></html>"
 
 
