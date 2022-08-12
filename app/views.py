@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, abort
 from .session_interface import MySessionInterface
 
 app = Flask(__name__)
@@ -6,62 +6,61 @@ app.secret_key = b"?8jyhf73hf"
 app.session_interface = MySessionInterface()
 
 
+def get_current_username():
+    username = ""
+    login_auth = False
+
+    if "username" in session:
+        username = session["username"]
+        login_auth = True
+    return username, login_auth
+
+
 @app.route("/")
-def Definition():
-    if 'name' in session:
-        print('name', session['name'])
-    session['name'] = "Ahmet"
-    session['lastname'] = "Özgür"
-    session['username'] = "ahmet1234"
-    return "<html><body><h1>İlk Flask denemesi</h1></body></html>"
+def Index():
+    username, login_auth = get_current_username()
+    return render_template("index.html", username=username, login_auth=login_auth)
 
 
-@app.route("/hello")
-def Hello():
-    return render_template("hello.html")
+@app.route("/contact", methods=["GET", "POST"])
+def Contact():
+    if request.method == "POST":
+        pass
+    username, login_auth = get_current_username()
+    return render_template("contact.html", username=username, login_auth=login_auth)
 
 
-@app.route("/hello-admin")
-def HelloAdmin():
-    return render_template("hello_admin.html")
+@app.route("/contactlist")
+def ContactList():
+    username, login_auth = get_current_username()
+    contactList = [
+        ["Berk", "Satış", "Yüksek"],
+        ["Ezgi", "İnsan Kaynakları", "Orta"],
+        ["Ali", "Nakliye", "Yüksek"],
+        ["Ecem", "Üretim", "Düşük"]
+    ]
+    return render_template("contact_list.html", username=username, login_auth=login_auth, contactList=contactList)
 
 
-@app.route("/hello-user/<name>")
-def HelloUser(name):
-    if name.lower() == "admin":
-        return redirect(url_for("HelloAdmin"))
-    print(name)
-    return render_template("hello_user.html", username=name)
-
-
-@app.route("/add")
-def Add():
-    number1 = int(request.args["number1"])
-    number2 = int(request.args["number2"])
-    calculation_result = number1 + number2
-    return render_template("add.html", number1=number1, number2=number2, result=calculation_result)
-
-
-@app.route("/login", methods=['POST', 'GET'])
+@app.route("/login", methods=["GET", "POST"])
 def Login():
     if request.method == "POST":
-        username = request.form["username"]
-        return redirect(url_for("HelloUser", name=username))
-    else:
-        return render_template("login.html")
+        if request.form:
+            if "username" in request.form and "password" in request.form:
+                username = request.form["username"]
+                password = request.form["password"]
+                if username == "admin" and password == "admin":
+                    session["username"] = username
+                    return redirect(url_for("Index"))
+                else:
+                    return redirect(url_for("Login"))
+        abort(400)
+    username, login_auth = get_current_username()
+    return render_template("login.html", username=username, login_auth=login_auth)
 
 
-@app.route("/student")
-def Student():
-    return render_template("student.html")
-
-
-@app.route("/result", methods=['POST'])
-def Result():
-    ContextData = {
-        'name': request.form["name"],
-        'fizik': request.form["fizik"],
-        'matematik': request.form["matematik"],
-        'kimya': request.form["kimya"]
-    }
-    return render_template("student_result.html", **ContextData)
+@app.route("/logout")
+def Logout():
+    if "username" in session:
+        del session["username"]
+    return redirect(url_for("Index"))
