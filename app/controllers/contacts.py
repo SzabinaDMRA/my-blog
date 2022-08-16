@@ -18,3 +18,4 @@ def SaveContactRequest(name, email, category, priority, message):
     contactRequest.priority = priority
     contactRequest.message = message
     contactRequest.Save()
+    print(contactRequest.__str__())
