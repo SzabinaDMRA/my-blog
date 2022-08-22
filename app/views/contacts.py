@@ -1,7 +1,10 @@
-from flask import request, redirect, url_for, render_template
+from flask import request, redirect, url_for, render_template, Blueprint
 from app.controllers import SaveContactRequest, GetCurrentUsername, GetContactList
 
+bp = Blueprint("contacts", __name__, template_folder="../templates")
 
+
+@bp.route("/contact", methods=["GET", "POST"])
 def Contact():
     if request.method == "POST":
         if request.form:
@@ -13,13 +16,14 @@ def Contact():
 
             SaveContactRequest(name, email, category, priority, message)
 
-            return redirect(url_for("Contact"))
+            return redirect(url_for("contacts.Contact"))
 
     username, loginAuth = GetCurrentUsername()
 
     return render_template("contact.html", username=username, login_auth=loginAuth)
 
 
+@bp.route("/list")
 def ContactList():
     username, loginAuth = GetCurrentUsername()
     contactList = GetContactList()
