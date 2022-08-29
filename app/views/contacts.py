@@ -27,4 +27,5 @@ def Contact():
 def ContactList():
     username, loginAuth = GetCurrentUsername()
     contactList = GetContactList()
+
     return render_template("contact_list.html", username=username, login_auth=loginAuth, contactList=contactList)
