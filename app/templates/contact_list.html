@@ -9,16 +9,18 @@
                 <thead>
                 <tr>
                     <th>İsim</th>
+                    <th>Email</th>
                     <th>Bölüm</th>
                     <th>Öncelik</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for name, department, priority in contactList %}
+                {% for data in contactList %}
                 <tr>
-                    <td>{{ name }}</td>
-                    <td>{{ department }}</td>
-                    <td>{{ priority }}</td>
+                    <td>{{ data.name }}</td>
+                    <td>{{ data.email }}</td>
+                    <td>{{ data.category }}</td>
+                    <td>{{ data.priority }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

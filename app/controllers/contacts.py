@@ -2,20 +2,40 @@ from app.models import ContactRequest
 
 
 def GetContactList():
-    return [
-        ["Berk", "Satış", "Yüksek"],
-        ["Ezgi", "İnsan Kaynakları", "Orta"],
-        ["Ali", "Nakliye", "Yüksek"],
-        ["Ecem", "Üretim", "Düşük"]
-    ]
+    get_all_contact = ContactRequest.select(
+        ContactRequest.name,
+        ContactRequest.email,
+        ContactRequest.category,
+        ContactRequest.priority
+    )
+
+    contactList = []
+
+    for contact in get_all_contact:
+        contactList.append(
+            dict(
+                name=contact.name,
+                email=contact.email,
+                category=contact.category,
+                priority=contact.priority
+            )
+        )
+
+    return contactList
 
 
 def SaveContactRequest(name, email, category, priority, message):
-    contactRequest = ContactRequest()
-    contactRequest.name = name
-    contactRequest.email = email
-    contactRequest.category = category
-    contactRequest.priority = priority
-    contactRequest.message = message
-    contactRequest.Save()
-    print(contactRequest.__str__())
+    try:
+        ContactRequest.create(
+            name=name,
+            email=email,
+            category=category,
+            priority=priority,
+            message=message
+        )
+
+        return True
+    except Exception as error:
+        print(error)
+
+        return False
